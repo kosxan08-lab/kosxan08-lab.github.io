@@ -16,7 +16,6 @@ So grab a juice box, sit back, and let’s hop into this journey together. Remem
 <img width="391" height="397" alt="image" src="https://github.com/user-attachments/assets/bfaa0186-d112-4516-920e-79ee1bc51c70" />
 
 
-<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
