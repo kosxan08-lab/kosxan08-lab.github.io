@@ -386,3 +386,219 @@ So grab a juice box, sit back, and let’s hop into this journey together. Remem
 </script>
 </body>
 </html>
+
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Blog with a friendly girl</title>
+<style>
+  body { font-family: Georgia, serif; text-align: center; background: #e6f2dc; color: #12261c; padding: 40px 16px; }
+</style>
+</head>
+<body>
+<h1>Welcome to my blog 🐸</h1>
+<p>The girl in the corner waves when you click her.</p>
+
+<!-- GIRL WIDGET START: copy everything from here down to the END comment and paste it before </body> in your index.html -->
+<style>
+  #girl-box {
+    position: fixed; right: 8px; bottom: 0;      /* change "right" to "left" to move her to the other corner */
+    width: min(220px, 42vw); aspect-ratio: 220 / 290;
+    z-index: 9999; pointer-events: none;
+  }
+  #girl-box canvas { display: block; width: 100%; height: 100%; }
+  #girl-bubble {
+    position: absolute; left: 50%; top: 2%; transform: translateX(-50%);
+    background: #fff; color: #12261c; padding: 6px 12px; border-radius: 14px;
+    font: 15px Georgia, serif; white-space: nowrap;
+    box-shadow: 0 2px 8px rgba(0,0,0,.25); opacity: 0; transition: opacity .3s;
+  }
+</style>
+<div id="girl-box"><div id="girl-bubble"></div></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+(function () {
+  const box = document.getElementById("girl-box");
+  const bubble = document.getElementById("girl-bubble");
+
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(30, 220 / 290, 0.1, 50);
+  camera.position.set(0, 1.9, 9);
+  camera.lookAt(0, 1.9, 0);
+
+  const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  box.appendChild(renderer.domElement);
+  function resize() {
+    const w = box.clientWidth, h = box.clientHeight;
+    renderer.setSize(w, h, false);
+    camera.aspect = w / h;
+    camera.updateProjectionMatrix();
+  }
+  window.addEventListener("resize", resize);
+  resize();
+
+  scene.add(new THREE.AmbientLight(0xffffff, 0.85));
+  const sun = new THREE.DirectionalLight(0xffffff, 0.8);
+  sun.position.set(2, 4, 5);
+  scene.add(sun);
+
+  // ----- Materials and helper -----
+  const mat = (c, r = 0.6) => new THREE.MeshStandardMaterial({ color: c, roughness: r });
+  const skin = mat(0xffd9b8, 0.7), hairM = mat(0xf7d65a, 0.55), dressM = mat(0xf06aa8),
+        white = mat(0xffffff), shoeM = mat(0xd6335b), dark = mat(0x234a8c, 0.3),
+        pinkM = mat(0xff9db8), lipM = mat(0xb23a48);
+  function add(parent, geo, m, x, y, z) {
+    const o = new THREE.Mesh(geo, m);
+    o.position.set(x, y, z);
+    parent.add(o);
+    return o;
+  }
+
+  // ----- Body -----
+  const girl = new THREE.Group();
+  scene.add(girl);
+
+  [-1, 1].forEach(s => {
+    add(girl, new THREE.CylinderGeometry(0.09, 0.09, 0.8, 12), skin, s * 0.2, 0.5, 0);
+    add(girl, new THREE.SphereGeometry(0.14, 14, 10), shoeM, s * 0.2, 0.1, 0.07).scale.set(1, 0.6, 1.5);
+  });
+  add(girl, new THREE.CylinderGeometry(0.34, 0.72, 1.1, 28), dressM, 0, 1.45, 0);
+  add(girl, new THREE.TorusGeometry(0.43, 0.03, 8, 28), white, 0, 1.75, 0).rotation.x = Math.PI / 2;
+  add(girl, new THREE.TorusGeometry(0.72, 0.03, 8, 32), white, 0, 0.91, 0).rotation.x = Math.PI / 2;
+  add(girl, new THREE.CylinderGeometry(0.09, 0.09, 0.22, 12), skin, 0, 2.07, 0);
+
+  function makeArm(side) {
+    const shoulder = new THREE.Group();
+    shoulder.position.set(side * 0.38, 1.93, 0);
+    girl.add(shoulder);
+    add(shoulder, new THREE.SphereGeometry(0.11, 12, 10), dressM, 0, 0, 0);
+    add(shoulder, new THREE.CylinderGeometry(0.075, 0.07, 0.55, 12), skin, 0, -0.28, 0);
+    const elbow = new THREE.Group();
+    elbow.position.y = -0.56;
+    shoulder.add(elbow);
+    add(elbow, new THREE.CylinderGeometry(0.07, 0.06, 0.5, 12), skin, 0, -0.25, 0);
+    add(elbow, new THREE.SphereGeometry(0.1, 12, 10), skin, 0, -0.54, 0);
+    return { shoulder, elbow };
+  }
+  const armL = makeArm(-1);
+  const armR = makeArm(1);   // the arm on the right side of the screen is the waving one
+
+  // ----- Head -----
+  const head = new THREE.Group();
+  head.position.y = 2.6;
+  girl.add(head);
+  add(head, new THREE.SphereGeometry(0.5, 28, 22), skin, 0, 0, 0);
+
+  // Blonde hair: fringe cap on top, fuller hair behind, two pigtails
+  add(head, new THREE.SphereGeometry(0.54, 28, 18, 0, Math.PI * 2, 0, Math.PI * 0.38), hairM, 0, 0.02, -0.01).rotation.x = 0.2;
+  add(head, new THREE.SphereGeometry(0.55, 24, 18), hairM, 0, 0.02, -0.13).scale.set(1, 0.85, 1);
+
+  const tails = [];
+  [-1, 1].forEach(s => {
+    const g = new THREE.Group();
+    g.position.set(s * 0.5, 0.02, -0.06);
+    head.add(g);
+    add(g, new THREE.SphereGeometry(0.085, 10, 8), pinkM, s * 0.04, 0, 0);
+    add(g, new THREE.SphereGeometry(0.2, 14, 12), hairM, s * 0.09, -0.36, 0).scale.set(0.6, 1.8, 0.6);
+    g.userData.s = s;
+    tails.push(g);
+  });
+
+  // Face
+  const eyes = [];
+  [-1, 1].forEach(s => {
+    const e = add(head, new THREE.SphereGeometry(0.075, 14, 12), dark, s * 0.17, -0.03, 0.44);
+    e.scale.set(1, 1.25, 0.6);
+    eyes.push(e);
+    add(head, new THREE.SphereGeometry(0.025, 8, 8), white, s * 0.17 + 0.02, 0.0, 0.49);
+    add(head, new THREE.SphereGeometry(0.07, 12, 10), pinkM, s * 0.3, -0.13, 0.37).scale.set(1, 0.65, 0.4);
+  });
+  const smile = new THREE.TorusGeometry(0.09, 0.017, 8, 18, Math.PI);
+  smile.rotateZ(Math.PI);
+  add(head, smile, lipM, 0, -0.09, 0.47);
+
+  // Soft shadow on the ground
+  const shadow = new THREE.Mesh(
+    new THREE.CircleGeometry(0.85, 24).rotateX(-Math.PI / 2),
+    new THREE.MeshBasicMaterial({ color: 0x000000, transparent: true, opacity: 0.2 })
+  );
+  shadow.position.y = 0.005;
+  scene.add(shadow);
+
+  // ----- Speech bubble -----
+  let bubbleTimer;
+  function say(text, ms) {
+    bubble.textContent = text;
+    bubble.style.opacity = 1;
+    clearTimeout(bubbleTimer);
+    bubbleTimer = setTimeout(() => { bubble.style.opacity = 0; }, ms);
+  }
+  say("Click me! 👋", 4500);
+
+  // ----- Wave on click -----
+  const DUR = 2.6;
+  let waveT = -1;
+  const ray = new THREE.Raycaster();
+  const pt = new THREE.Vector2();
+  window.addEventListener("pointerdown", e => {
+    const r = renderer.domElement.getBoundingClientRect();
+    if (e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom) return;
+    pt.set(((e.clientX - r.left) / r.width) * 2 - 1, -((e.clientY - r.top) / r.height) * 2 + 1);
+    ray.setFromCamera(pt, camera);
+    if (ray.intersectObject(girl, true).length && waveT < 0) {
+      waveT = 0;
+      say("Hi there! 👋", DUR * 1000);
+    }
+  });
+
+  // ----- Animation loop -----
+  const clock = new THREE.Clock();
+  let nextBlink = 2;
+  function frame() {
+    requestAnimationFrame(frame);
+    const dt = Math.min(clock.getDelta(), 0.05);
+    const t = clock.elapsedTime;
+
+    // Idle: breathing, gentle sway, head tilt
+    girl.position.y = Math.sin(t * 2) * 0.02;
+    girl.rotation.y = Math.sin(t * 0.7) * 0.12;
+
+    // Wave strength: eases in, holds, eases out
+    let amt = 0;
+    if (waveT >= 0) {
+      waveT += dt;
+      if (waveT > DUR) waveT = -1;
+      else amt = Math.min(1, waveT / 0.35) * Math.min(1, (DUR - waveT) / 0.35);
+    }
+    head.rotation.z = Math.sin(t * 1.3) * 0.04 + amt * 0.1;
+
+    armR.shoulder.rotation.z = 0.12 + (2.65 - 0.12) * amt;
+    armR.elbow.rotation.z = 0.1 + Math.sin(Math.max(waveT, 0) * 14) * 0.6 * amt;
+    armL.shoulder.rotation.z = -0.12 + Math.sin(t * 2) * 0.02;
+
+    tails.forEach(g => {
+      g.rotation.z = g.userData.s * (0.05 + Math.sin(t * 2.2 + g.userData.s) * 0.08 + amt * 0.05);
+    });
+
+    // Blink
+    const p = (t - nextBlink) / 0.18;
+    let sy = 1.25;
+    if (p >= 0 && p < 1) sy = 1.25 * (1 - 0.9 * Math.sin(p * Math.PI));
+    else if (p >= 1) nextBlink = t + 2 + Math.random() * 3;
+    eyes.forEach(e => { e.scale.y = sy; });
+
+    renderer.render(scene, camera);
+  }
+  frame();
+})();
+</script>
+<!-- GIRL WIDGET END -->
+
+</body>
+</html>
