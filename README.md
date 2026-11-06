@@ -1,6 +1,1 @@
-#include <stdio.h>
-
-int main(){
-  printf("Emma\n");
-  return 0;
-}
+# kosxan08-lab.github.io
