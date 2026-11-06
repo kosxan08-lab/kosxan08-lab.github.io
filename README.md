@@ -189,7 +189,7 @@ So grab a juice box, sit back, and let’s hop into this journey together. Remem
 
 
 
-<!DOCTYPE html>
+
 <html lang="en">
 <head>
 <meta charset="UTF-8">
